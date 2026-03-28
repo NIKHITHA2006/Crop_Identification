@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Identification Assistant</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Identify crops instantly with AI • Get expert farming advice • Real-time crop analysis">
+    <meta name="theme-color" content="#1b5e20">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Crop Analyzer">
+    <meta name="msapplication-TileColor" content="#1b5e20">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="./icons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/android-icon-192x192.png">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="./icons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="./icons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="./icons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="./icons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="./icons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="./icons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="./icons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="./icons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-icon-180x180.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1b5e20;
+            --primary-light: #2e7d32;
+            --primary-dark: #1a3a1f;
+            --secondary: #66bb6a;
+            --accent: #ffd54f;
+            --light: #f9f9f9;
+            --text: #212121;
+            --text-light: #757575;
+            --border: #e0e0e0;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --error: #f44336;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            min-height: 100vh;
+            padding: 16px;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid var(--secondary);
+        }
+
+        header h1 {
+            font-size: 3.2em;
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            font-size: 1.1em;
+            color: var(--text-light);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 24px;
+            margin-bottom: 32px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid rgba(102, 187, 106, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .card:hover {
+            box-shadow: 0 16px 48px rgba(27, 94, 32, 0.15);
+            border-color: var(--secondary);
+            transform: translateY(-4px);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        /* Upload Section */
+        .upload-area {
+            border: 3px dashed var(--secondary);
+            border-radius: 20px;
+            padding: 56px 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, rgba(102, 187, 106, 0.08) 0%, rgba(27, 94, 32, 0.03) 100%);
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 187, 106, 0.1) 0%, transparent 70%);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(20px, -20px) rotate(5deg); }
+        }
+
+        .upload-area.dragover {
+            background: linear-gradient(135deg, rgba(27, 94, 32, 0.12) 0%, rgba(102, 187, 106, 0.08) 100%);
+            border-color: var(--primary);
+            transform: scale(1.02);
+            box-shadow: 0 12px 36px rgba(27, 94, 32, 0.2);
+        }
+
+        .upload-area input {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 4.5em;
+            margin-bottom: 20px;
+            animation: bounce 3s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-16px) scale(1.05); }
+        }
+
+        .upload-area p {
+            color: var(--text);
+            font-size: 1.15em;
+            margin-bottom: 10px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .upload-area .hint {
+            color: var(--text-light);
+            font-size: 1em;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Preview Image */
+        #imagePreview {
+            max-width: 100%;
+            height: auto;
+            border-radius: 18px;
+            margin-bottom: 24px;
+            max-height: 420px;
+            object-fit: cover;
+            box-shadow: 0 12px 40px rgba(27, 94, 32, 0.2);
+            display: none;
+            border: 3px solid var(--secondary);
+        }
+
+        #imagePreview.show {
+            display: block;
+            animation: zoomIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.88) rotateX(10deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotateX(0);
+            }
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 28px;
+            font-size: 0.95em;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            min-width: 140px;
+            font-family: 'Poppins', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(27, 94, 32, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 32px rgba(27, 94, 32, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-reset {
+            background: #f5f5f5;
+            color: var(--text);
+            border: 2px solid var(--secondary);
+            transition: all 0.3s ease;
+        }
+
+        .btn-reset:hover {
+            background: var(--secondary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Result Section */
+        .result-section {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.08) 0%, rgba(76, 175, 80, 0.03) 100%);
+            border-left: 5px solid var(--success);
+            padding: 28px;
+            border-radius: 18px;
+            margin-top: 28px;
+            display: none;
+            border: 2px solid rgba(76, 175, 80, 0.2);
+            transition: all 0.4s ease;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .result-section h3 {
+            color: var(--primary);
+            margin-bottom: 16px;
+            font-size: 1.25em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-section h3::before {
+            content: '✓';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--success);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        #result {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 14px;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.8;
+            color: var(--text);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.98em;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(27, 94, 32, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Chatbot Section */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 600px;
+        }
+
+        #chatbox {
+            flex: 1;
+            border: 2px solid var(--border);
+            border-radius: 18px;
+            padding: 20px;
+            overflow-y: auto;
+            background: linear-gradient(135deg, rgba(248, 248, 248, 0.7) 0%, rgba(255, 255, 255, 0.9) 100%);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .chat-message {
+            padding: 14px 18px;
+            border-radius: 16px;
+            max-width: 85%;
+            word-wrap: break-word;
+            line-height: 1.6;
+            animation: messageSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95em;
+            font-family: 'Inter', sans-serif;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 20px 20px 4px 20px;
+            box-shadow: 0 6px 18px rgba(27, 94, 32, 0.25);
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background: white;
+            color: var(--text);
+            border: 2px solid var(--border);
+            border-radius: 20px 20px 20px 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 90%;
+        }
+
+        .bot-message strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .bot-message div {
+            margin-bottom: 8px;
+            line-height: 1.65;
+        }
+
+        .bot-message div:last-child {
+            margin-bottom: 0;
+        }
+
+        .chat-input-section {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        #message {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.95em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Poppins', sans-serif;
+            background: white;
+        }
+
+        #message:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 4px rgba(102, 187, 106, 0.2);
+            background: white;
+        }
+
+        .btn-send {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 100px;
+            box-shadow: 0 6px 20px rgba(27, 94, 32, 0.3);
+            font-size: 0.9em;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-send:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(27, 94, 32, 0.4);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+
+        .empty-state p {
+            font-size: 1.05em;
+            font-weight: 500;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(102, 187, 106, 0.2);
+            color: var(--primary);
+            border-radius: 24px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .status-badge.error {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--error);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.4em;
+            }
+
+            .card {
+                padding: 24px;
+            }
+
+            .upload-area {
+                padding: 40px 24px;
+            }
+
+            .upload-icon {
+                font-size: 3.5em;
+            }
+
+            .chat-message {
+                max-width: 92%;
+            }
+
+            button {
+                padding: 12px 20px;
+                font-size: 0.9em;
+            }
+        }
+
+        /* Enhanced Mobile Optimization */
+        @media (max-width: 768px) {
+            * {
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            body {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 0;
+            }
+
+            header {
+                margin-bottom: 24px;
+                padding-bottom: 20px;
+            }
+
+            header h1 {
+                font-size: 2em;
+                margin-bottom: 8px;
+                line-height: 1.2;
+            }
+
+            header p {
+                font-size: 0.9em;
+                line-height: 1.4;
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                margin-bottom: 20px;
+            }
+
+            .card {
+                padding: 16px;
+                border-radius: 16px;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            }
+
+            .card h2 {
+                font-size: 1.4em;
+                margin-bottom: 16px;
+                gap: 10px;
+            }
+
+            .card h2 i {
+                font-size: 1.2em;
+            }
+
+            .upload-area {
+                padding: 32px 16px;
+                border-radius: 16px;
+                margin-bottom: 16px;
+            }
+
+            .upload-icon {
+                font-size: 3em;
+                margin-bottom: 12px;
+            }
+
+            .upload-area p {
+                font-size: 1em;
+                margin-bottom: 6px;
+            }
+
+            .upload-area .hint {
+                font-size: 0.85em;
+            }
+
+            #imagePreview {
+                max-height: 300px;
+                margin-bottom: 16px;
+                border-radius: 12px;
+            }
+
+            .button-group {
+                gap: 10px;
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+                padding: 12px 16px;
+                font-size: 0.9em;
+                min-width: auto;
+                border-radius: 10px;
+                letter-spacing: 0.5px;
+            }
+
+            .btn-send {
+                width: auto;
+                min-width: 48px;
+                padding: 12px 16px;
+            }
+
+            .result-section {
+                padding: 16px;
+                margin-top: 16px;
+                border-radius: 12px;
+                border-left-width: 4px;
+            }
+
+            .result-section h3 {
+                font-size: 1.1em;
+                margin-bottom: 12px;
+            }
+
+            #result {
+                padding: 16px;
+                font-size: 0.9em;
+                line-height: 1.6;
+                border-radius: 10px;
+            }
+
+            .chat-container {
+                min-height: 400px;
+            }
+
+            #chatbox {
+                min-height: 350px;
+                max-height: 400px;
+                padding: 16px;
+                margin-bottom: 12px;
+                border-radius: 12px;
+                gap: 10px;
+            }
+
+            .chat-message {
+                padding: 10px 14px;
+                border-radius: 12px;
+                max-width: 85%;
+                font-size: 0.9em;
+                line-height: 1.5;
+            }
+
+            .user-message {
+                border-radius: 16px 16px 2px 16px;
+            }
+
+            .bot-message {
+                border-radius: 16px 16px 16px 2px;
+                max-width: 88%;
+            }
+
+            .chat-input-section {
+                gap: 8px;
+                align-items: stretch;
+            }
+
+            #message {
+                padding: 12px 14px;
+                font-size: 0.9em;
+                border-radius: 10px;
+                min-height: 44px;
+            }
+
+            #message::placeholder {
+                font-size: 0.9em;
+            }
+
+            .empty-state {
+                padding: 24px 16px;
+            }
+
+            .empty-state-icon {
+                font-size: 3em;
+            }
+
+            .empty-state p {
+                font-size: 0.95em;
+            }
+
+            .status-badge {
+                padding: 8px 12px;
+                font-size: 0.8em;
+                margin-bottom: 10px;
+            }
+
+            .loading {
+                width: 14px;
+                height: 14px;
+                border-width: 2px;
+                margin-right: 6px;
+            }
+
+            ::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                border-radius: 6px;
+            }
+        }
+
+        /* Extra Small Devices (< 480px) */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            header h1 {
+                font-size: 1.6em;
+                margin-bottom: 6px;
+            }
+
+            header p {
+                font-size: 0.85em;
+            }
+
+            .card {
+                padding: 12px;
+                border-radius: 14px;
+            }
+
+            .card h2 {
+                font-size: 1.2em;
+                margin-bottom: 12px;
+            }
+
+            .upload-area {
+                padding: 24px 12px;
+            }
+
+            .upload-icon {
+                font-size: 2.5em;
+                margin-bottom: 10px;
+            }
+
+            .upload-area p {
+                font-size: 0.9em;
+            }
+
+            button {
+                padding: 11px 14px;
+                font-size: 0.85em;
+                letter-spacing: 0.3px;
+            }
+
+            .chat-container {
+                min-height: 350px;
+            }
+
+            #chatbox {
+                min-height: 300px;
+                max-height: 350px;
+                padding: 12px;
+            }
+
+            .chat-message {
+                padding: 9px 12px;
+                font-size: 0.85em;
+            }
+
+            .result-section {
+                padding: 12px;
+            }
+
+            #result {
+                padding: 12px;
+                font-size: 0.85em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header data-aos="fade-down">
+            <h1>🌾 Crop Identification Assistant</h1>
+            <p>Identify crops instantly with AI • Get expert farming advice • Real-time crop analysis</p>
+        </header>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Crop Identification Card -->
+            <div class="card" data-aos="fade-right">
+                <h2><i class="fas fa-leaf"></i> Crop Analyzer</h2>
+                
+                <!-- Upload Area -->
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📸</div>
+                    <p><strong>Drop your crop image here</strong></p>
+                    <p class="hint">or click to select from your device</p>
+                    <input type="file" id="imageInput" accept="image/*">
+                </div>
+
+                <!-- Image Preview -->
+                <img id="imagePreview" alt="Crop preview">
+
+                <!-- Action Buttons -->
+                <div class="button-group">
+                    <button class="btn-primary" onclick="identifyCrop()" id="identifyBtn">
+                        <i class="fas fa-sparkles"></i> Analyze Crop
+                    </button>
+                    <button class="btn-reset" onclick="resetUpload()">
+                        <i class="fas fa-redo"></i> Clear
+                    </button>
+                </div>
+
+                <!-- Result Section -->
+                <div class="result-section" id="resultSection">
+                    <h3>Analysis Results</h3>
+                    <div id="result"></div>
+                </div>
+            </div>
+
+            <!-- Chatbot Card -->
+            <div class="card" data-aos="fade-left">
+                <h2><i class="fas fa-comments"></i> Farming Assistant</h2>
+                <p style="color: var(--text-light); margin-bottom: 16px; font-size: 0.95em; line-height: 1.6;"><i class="fas fa-info-circle"></i> Ask about diseases, soil, fertilizer, pest management & more</p>
+                
+                <div class="chat-container">
+                    <div id="chatbox" class="empty-state">
+                        <div class="empty-state-icon">💭</div>
+                        <p>Start a conversation with your farming expert</p>
+                    </div>
+
+                    <div class="chat-input-section">
+                        <input 
+                            type="text" 
+                            id="message" 
+                            placeholder="Ask about your crops..."
+                            onkeypress="if(event.key==='Enter') sendMessage()"
+                        >
+                        <button class="btn-send" onclick="sendMessage()" title="Send Message">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                        <button class="btn-send" style="background: #f5f5f5; color: var(--text); width: 48px; padding: 14px;" onclick="clearChat()" title="Clear Chat">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AOS Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+
+    <script type="module">
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: false,
+            offset: 100
+        });
+
+        // ========================================
+        // 📱 REGISTER SERVICE WORKER
+        // ========================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('[PWA] Service Worker registered');
+                    })
+                    .catch(error => {
+                        console.error('[PWA] Registration failed:', error);
+                    });
+            });
+        }
+
+        // ========================================
+        // 🔐 Initialize Client Connection
+        // ========================================
+        import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js";
+
+        let client;
+        let history = [];
+        let isProcessing = false;
+
+        async function initClient() {
+            try {
+                client = await Client.connect("selva1909/Crop-Prediction");
+                console.log("[✓] Connected to HF Space");
+            } catch (error) {
+                console.error("[✗] Connection failed:", error);
+                showError("Failed to connect. Please refresh the page.");
+            }
+        }
+
+        await initClient();
+
+        // ========================================
+        // 📤 DRAG & DROP FUNCTIONALITY
+        // ========================================
+        const uploadArea = document.getElementById("uploadArea");
+        const imageInput = document.getElementById("imageInput");
+        const imagePreview = document.getElementById("imagePreview");
+
+        ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults);
+            document.body.addEventListener(eventName, preventDefaults);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ["dragenter", "dragover"].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.add("dragover"));
+        });
+
+        ["dragleave", "drop"].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove("dragover"));
+        });
+
+        uploadArea.addEventListener("drop", (e) => {
+            imageInput.files = e.dataTransfer.files;
+            handleFileSelect();
+        });
+
+        uploadArea.addEventListener("click", () => imageInput.click());
+        imageInput.addEventListener("change", handleFileSelect);
+
+        function handleFileSelect() {
+            const file = imageInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreview.classList.add("show");
+                };
+                reader.readAsDataURL(file);
+                document.getElementById("resultSection").classList.remove("show");
+            }
+        }
+
+        // ========================================
+        // 🌾 IDENTIFY CROP
+        // ========================================
+        window.identifyCrop = async function () {
+            const file = imageInput.files[0];
+
+            if (!file) {
+                showError("Please upload an image first");
+                return;
+            }
+
+            if (isProcessing) return;
+            isProcessing = true;
+
+            const identifyBtn = document.getElementById("identifyBtn");
+            const originalText = identifyBtn.innerHTML;
+            identifyBtn.innerHTML = '<span class="loading"></span>Analyzing...';
+            identifyBtn.disabled = true;
+
+            try {
+                const result = await client.predict("/identify_crop", { image_file: file });
+                document.getElementById("result").innerText = result.data;
+                document.getElementById("resultSection").classList.add("show");
+                console.log("[✓] Crop identified");
+            } catch (error) {
+                console.error("[✗] Error:", error);
+                showError("Failed to identify crop. Please try again.");
+            } finally {
+                identifyBtn.innerHTML = originalText;
+                identifyBtn.disabled = false;
+                isProcessing = false;
+            }
+        };
+
+        // ========================================
+        // 💬 CHATBOT
+        // ========================================
+        history = [];
+        const chatbox = document.getElementById("chatbox");
+
+        window.sendMessage = async function () {
+            const msgInput = document.getElementById("message");
+            const message = msgInput.value.trim();
+
+            if (!message || isProcessing) return;
+            isProcessing = true;
+
+            if (chatbox.classList.contains("empty-state")) {
+                chatbox.innerHTML = "";
+                chatbox.classList.remove("empty-state");
+            }
+
+            const userMsg = document.createElement("div");
+            userMsg.className = "chat-message user-message";
+            userMsg.textContent = message;
+            chatbox.appendChild(userMsg);
+            msgInput.value = "";
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+            try {
+                // ✅ Check for simple greetings only
+                const msg = message.toLowerCase().trim();
+                const greetings = ['hi', 'hello', 'hey', 'hiya', 'hlo', 'hi there'];
+                
+                if (greetings.some(g => msg === g || msg.startsWith(g + ' '))) {
+                    // Show simple greeting response
+                    const botMsg = document.createElement("div");
+                    botMsg.className = "chat-message bot-message";
+                    botMsg.innerHTML = '<p style="margin-bottom: 12px;">Hi! 👋 How can I help you today?</p>';
+                    chatbox.appendChild(botMsg);
+                    chatbox.scrollTop = chatbox.scrollHeight;
+                    console.log("[✓] Greeting detected");
+                } else {
+                    // Send to API for crop-related questions
+                    const result = await client.predict("/chat_ui", { message, history });
+                    history = result.data[0];
+                    const reply = history[history.length - 1][1];
+
+                    const botMsg = document.createElement("div");
+                    botMsg.className = "chat-message bot-message";
+                    botMsg.innerHTML = formatBotResponse(reply);
+                    chatbox.appendChild(botMsg);
+                    chatbox.scrollTop = chatbox.scrollHeight;
+                    console.log("[✓] API response received");
+                }
+            } catch (error) {
+                const errorMsg = document.createElement("div");
+                errorMsg.className = "chat-message bot-message";
+                errorMsg.textContent = "Error: Failed to get response.";
+                chatbox.appendChild(errorMsg);
+            } finally {
+                isProcessing = false;
+            }
+        };
+
+        // ✅ Format bot response for better readability
+        function formatBotResponse(text) {
+            let formatted = text;
+
+            // Convert numbered lists (1. 2. 3. etc)
+            formatted = formatted.replace(
+                /(\d+)\.\s\*\*([^*]+)\*\*:\s/g,
+                '<p style="margin-bottom: 12px; margin-top: 8px;"><strong style="color: var(--primary); font-size: 1.05em;">$1. $2:</strong><br>'
+            );
+
+            // Convert bold text (**text**)
+            formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+            // Add line breaks after periods followed by numbers
+            formatted = formatted.replace(/\.\s+(\d+)\./g, '.</p><p style="margin-bottom: 12px; margin-top: 8px;">$1.');
+
+            // Replace multiple spaces with proper formatting
+            formatted = formatted.replace(/\n\n/g, '</p><p style="margin-bottom: 12px;">');
+            formatted = formatted.replace(/\n/g, '<br>');
+
+            // Wrap in paragraph if not already wrapped
+            if (!formatted.startsWith('<p')) {
+                formatted = `<p style="margin-bottom: 12px;">${formatted}</p>`;
+            }
+
+            // Clean up empty paragraphs
+            formatted = formatted.replace(/<p[^>]*>\s*<\/p>/g, '');
+
+            return formatted;
+        }
+
+        window.resetUpload = function () {
+            imageInput.value = "";
+            imagePreview.classList.remove("show");
+            document.getElementById("result").innerText = "";
+            document.getElementById("resultSection").classList.remove("show");
+        };
+
+        window.clearChat = function () {
+            history = [];
+            chatbox.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💭</div><p>Start a conversation with your farming expert</p></div>';
+            chatbox.classList.add("empty-state");
+            document.getElementById("message").value = "";
+        };
+
+        function showError(message) {
+            document.getElementById("result").innerHTML = `<div class="status-badge error">❌ ${message}</div>`;
+            document.getElementById("resultSection").classList.add("show");
+        }
+    </script>
+</body>
+</html>
